@@ -9,6 +9,7 @@ import {
 } from "../types/index";
 
 const InvoiceForm: React.FC = () => {
+  const [disabled, setDisabled] = useState(false);
   const [formData, setFormData] = useState({
     sellerDetails: {
       name: "",
@@ -95,6 +96,7 @@ const InvoiceForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setDisabled(true); // Disable the button
     try {
       const response = await axios.post(
         "http://localhost:5000/api/generate-invoice",
@@ -114,10 +116,42 @@ const InvoiceForm: React.FC = () => {
       document.body.appendChild(link);
       link.click();
       link.remove();
+      setDisabled(false);
     } catch (error) {
       console.error("Error generating invoice", error);
     }
+    // finally {
+    //   setTimeout(() => {
+    //     setDisabled(false);
+    //   }, 500);
+    // }
   };
+
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   try {
+  //     const response = await axios.post(
+  //       "http://localhost:5000/api/generate-invoice",
+  //       formData,
+  //       {
+  //         responseType: "blob",
+  //       }
+  //     );
+  //     const blob = new Blob([response.data], { type: "application/pdf" });
+  //     const url = window.URL.createObjectURL(blob);
+  //     const link = document.createElement("a");
+  //     link.href = url;
+  //     link.setAttribute(
+  //       "download",
+  //       `Invoice-${formData.orderDetails.orderNo}.pdf`
+  //     );
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     link.remove();
+  //   } catch (error) {
+  //     console.error("Error generating invoice", error);
+  //   }
+  // };
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-lg mx-auto">
@@ -278,6 +312,7 @@ const InvoiceForm: React.FC = () => {
       {/* Submit Button */}
       <button
         type="submit"
+        disabled={disabled}
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
       >
         Generate Invoice
